@@ -77,12 +77,41 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 
 #include <algorithm>
 #include <cmath>
-#include <string>
-public:
-    void UpdatePlayerShips();
-    void UpdateOtherShips();
-    void UpdatePlayerEffects();
-    void UpdateOtherEffects();
+#include <string>void Engine::UpdatePlayerShips()
+{
+    for(auto& ship : playerShips)
+    {
+        if(ship)
+            ship->Update(timeStep);
+    }
+}
+
+void Engine::UpdateOtherShips()
+{
+    for(auto& ship : otherShips)
+    {
+        if(ship)
+            ship->Update(timeStep);
+    }
+}
+
+void Engine::UpdatePlayerEffects()
+{
+    for(auto& effect : playerEffects)
+    {
+        if(effect)
+            effect->Update();
+    }
+}
+
+void Engine::UpdateOtherEffects()
+{
+    for(auto& effect : otherEffects)
+    {
+        if(effect)
+            effect->Update();
+    }
+}
 using namespace std;
 
 namespace {
