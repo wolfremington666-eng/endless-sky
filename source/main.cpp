@@ -47,6 +47,71 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #include "test/Test.h"
 #include "test/TestContext.h"
 #include "UI.h"
+// Add this include at the top
+#include "ThreadManager.h"
+
+void GameLoop(PlayerInfo &player, TaskQueue &queue, const Conversation &conversation,
+		const string &testToRunName, bool debugMode)
+{
+	// ... existing code ...
+	
+	// Create thread manager for parallel ship and effect processing
+	ThreadManager threadManager(4); // 2 threads for ships, 2 for effects
+	
+	// ... rest of GameLoop code ...
+	
+	// In the main game loop, replace the StepAll() call with:
+	if(!testContext.CurrentTest())
+	{
+		// ... existing performance tracking code ...
+		
+		while(!menuPanels.IsDone())
+		{
+			// ... existing event processing code ...
+			
+			// MODIFIED: Parallel ship and effect updates
+			if(!isDebugPaused && menuPanels.IsEmpty())
+			{
+				// Get ships and effects from the engine
+				MainPanel *mainPanel = static_cast<MainPanel *>(gamePanels.Root().get());
+				if(mainPanel)
+				{
+					Engine& engine = mainPanel->GetEngine();
+					
+					// Submit player ship updates to one thread
+					threadManager.submitShipTask([&engine]() {
+						engine.UpdatePlayerShips();
+					});
+					
+					// Submit other ships to another thread
+					threadManager.submitShipTask([&engine]() {
+						engine.UpdateOtherShips();
+					});
+					
+					// Submit player effects to one thread
+					threadManager.submitEffectTask([&engine]() {
+						engine.UpdatePlayerEffects();
+					});
+					
+					// Submit other effects to another thread
+					threadManager.submitEffectTask([&engine]() {
+						engine.UpdateOtherEffects();
+					});
+					
+					// Wait for all processing to complete before rendering
+					threadManager.waitForAllComplete();
+				}
+			}
+			else
+			{
+				// Regular single-threaded update
+				((!isDebugPaused && menuPanels.IsEmpty()) ? gamePanels : menuPanels).StepAll();
+			}
+			
+			// ... rest of existing loop code ...
+		}
+	}
+}
 
 #ifdef _WIN32
 #include "windows/TimerResolutionGuard.h"
