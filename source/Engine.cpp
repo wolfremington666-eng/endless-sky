@@ -78,7 +78,11 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <cmath>
 #include <string>
-
+public:
+    void UpdatePlayerShips();
+    void UpdateOtherShips();
+    void UpdatePlayerEffects();
+    void UpdateOtherEffects();
 using namespace std;
 
 namespace {
