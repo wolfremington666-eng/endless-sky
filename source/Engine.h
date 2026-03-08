@@ -43,7 +43,11 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 #include <memory>
 #include <utility>
 #include <vector>
-
+public:
+    void UpdatePlayerShips();
+    void UpdateOtherShips();
+    void UpdatePlayerEffects();
+    void UpdateOtherEffects();
 class Flotsam;
 class Government;
 class NPC;
